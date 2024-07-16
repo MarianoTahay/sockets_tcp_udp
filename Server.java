@@ -9,8 +9,6 @@ import java.util.regex.Pattern;
 public class Server {
     
     public static void main(String [] args) {
-
-        System.out.println();
         args_validation(args);
 
         if(args[3].equalsIgnoreCase("TCP")){
@@ -112,7 +110,7 @@ public class Server {
                 LocalDateTime now = LocalDateTime.now();
                 String dateTimeString = now.format(formatter);
                 String response = message_processing(decoded_message);
-                String server_log = "localhost" + " server [" + dateTimeString + "] UDP: " + response;
+                String server_log = server.getLocalAddress().toString() + " server [" + dateTimeString + "] UDP: " + response;
 
                 byte[] encoded_response = server_log.getBytes();
                 DatagramPacket send_message = new DatagramPacket(encoded_response, encoded_response.length, message_received.getAddress(), message_received.getPort());
@@ -137,7 +135,7 @@ public class Server {
             String message = log.substring(lastColonIndex + 1).trim();
 
             if(operation_validation(message)){
-                return String.valueOf(operation_result(message));
+                return operation_result(message);
             } else {
                 return message;
             }
@@ -151,11 +149,11 @@ public class Server {
         return Pattern.matches(operation_regex, message.replaceAll("\\s+",""));
     }
 
-    public static double operation_result(String operation){
+    public static String operation_result(String operation){
 
         String[] parts = (operation.replaceAll("\\s+","")).split("(?<=\\d)(?=[+\\-*/%])|(?<=[+\\-*/%])(?=\\d)");
         if (parts.length != 3) {
-            throw new IllegalArgumentException("Invalid operation format");
+            return "Error";
         }
 
         double left = Double.parseDouble(parts[0]);
@@ -164,18 +162,18 @@ public class Server {
 
         switch (operator) {
             case '+':
-                return left + right;
+                return String.valueOf(left + right);
             case '-':
-                return left - right;
+                return String.valueOf(left - right);
             case '*':
-                return left * right;
+                return String.valueOf(left * right);
             case '/':
-                if (right == 0) throw new IllegalArgumentException("Division by zero");
-                return left / right;
+                if (right == 0) return "Error";
+                return String.valueOf(left / right);
             case '%':
-                return left % right;
+                return String.valueOf(left % right);
             default:
-                throw new IllegalArgumentException("Unsupported operator: " + operator);
+                return "Unsupported operator: " + operator;
         }
     }
 

@@ -52,7 +52,7 @@ public class Client {
     }
 
     public static void tcp_client(String host, int port){
-        try(Socket cliente = new Socket("localhost", port)){
+        try(Socket cliente = new Socket(host, port)){
 
             InputStream in = cliente.getInputStream();
             OutputStream out = cliente.getOutputStream();
